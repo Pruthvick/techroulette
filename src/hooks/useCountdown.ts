@@ -45,7 +45,7 @@ export function useCountdown(durationMs: number, onComplete?: () => void) {
 
   useEffect(() => {
     if (!running) return;
-    let frame = 0;
+    let handle: ReturnType<typeof setTimeout>;
     const tick = () => {
       const endAt = endAtRef.current;
       if (endAt === null) return;
@@ -60,10 +60,10 @@ export function useCountdown(durationMs: number, onComplete?: () => void) {
         }
         return;
       }
-      frame = globalThis.setTimeout(tick, 250);
+      handle = setTimeout(tick, 250);
     };
-    frame = globalThis.setTimeout(tick, 250);
-    return () => globalThis.clearTimeout(frame);
+    handle = setTimeout(tick, 250);
+    return () => clearTimeout(handle);
   }, [running]);
 
   return { remaining, running, start, pause, resume, toggle };

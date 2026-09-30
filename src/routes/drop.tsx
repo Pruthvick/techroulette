@@ -21,9 +21,10 @@ const EXPLAIN_MS = 60 * 1000;
 type Phase = "setup" | "learning" | "explain" | "complete";
 
 export const Route = createFileRoute("/drop")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    concept: typeof search.concept === "string" ? search.concept : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { concept?: string } => {
+    const raw = search["concept"];
+    return typeof raw === "string" ? { concept: raw } : {};
+  },
   head: () => ({
     meta: [
       { title: "Drop a concept — ConceptDrop" },
