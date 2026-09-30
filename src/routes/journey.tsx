@@ -19,7 +19,7 @@ export const Route = createFileRoute("/journey")({
       },
     ],
   }),
-  component: Journey;
+  component: Journey,
 });
 
 function fmtMinutes(min: number) {
