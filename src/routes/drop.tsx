@@ -39,7 +39,7 @@ export const Route = createFileRoute("/drop")({
       },
     ],
   }),
-  component: DropPage;
+  component: DropPage,
 });
 
 function DropPage() {
