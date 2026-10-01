@@ -4,7 +4,7 @@ import { SiteNav } from "@/components/SiteNav";
 import { TimerRing } from "@/components/TimerRing";
 import { Chip, Tag } from "@/components/ui/chip";
 import { formatClock, useCountdown } from "@/hooks/useCountdown";
-import { useProgress, readRecentIds } from "@/hooks/useProgress";
+import { useProgress, readRecentIds, dayKey } from "@/hooks/useProgress";
 import { playChime } from "@/lib/chime";
 import {
   categories,
