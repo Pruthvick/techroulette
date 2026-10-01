@@ -27,13 +27,13 @@ export const Route = createFileRoute("/drop")({
   },
   head: () => ({
     meta: [
-      { title: "Drop a concept — ConceptDrop" },
+      { title: "Spin a concept — Tech Roulette" },
       {
         name: "description",
         content:
-          "Get a random concept, learn it for 15 minutes, then explain it in 60 seconds as if an interviewer just asked you.",
+          "Get a random concept, learn it for 15 minutes, then explain it out loud in 60 seconds.",
       },
-      { property: "og:title", content: "Drop a concept — 15 minutes on the clock" },
+      { property: "og:title", content: "Tech Roulette — 15 minutes on the clock" },
       {
         property: "og:description",
         content: "A random CS or AI/ML concept, a 15-minute learning timer and a 60-second explanation.",
@@ -49,6 +49,7 @@ function DropPage() {
   const { progress, markAttempt, markComplete, annotateLatest, toggleSound } = useProgress();
 
   const [phase, setPhase] = useState<Phase>("setup");
+  const [firstToday, setFirstToday] = useState(false);
   const [concept, setConcept] = useState<Concept | null>(null);
   const [category, setCategory] = useState<string | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
@@ -102,6 +103,7 @@ function DropPage() {
   // Record completion once the explain timer finishes.
   useEffect(() => {
     if (phase !== "complete" || !concept) return;
+    setFirstToday(progress.lastDay !== dayKey());
     markComplete(
       {
         id: concept.id,
@@ -196,7 +198,7 @@ function DropPage() {
               onClick={() => beginDrop()}
               className="glow-primary mt-8 w-full rounded-lg bg-primary px-8 py-4 font-mono text-sm font-bold tracking-[0.2em] text-primary-foreground transition-transform hover:scale-[1.01] sm:w-auto"
             >
-              DROP A CONCEPT
+              SPIN
             </button>
           </div>
         )}
@@ -204,7 +206,7 @@ function DropPage() {
         {phase === "learning" && concept && (
           <div className="animate-fade-in flex flex-col items-center text-center">
             <p className="font-mono text-[0.7rem] tracking-[0.35em] text-primary uppercase">
-              Concept drop
+              Your spin
             </p>
             <div className="card-surface glow-primary mt-5 w-full rounded-2xl px-6 py-10">
               <h1 className="font-mono text-3xl font-bold break-words sm:text-5xl">
@@ -260,7 +262,7 @@ function DropPage() {
               Time to explain.
             </h1>
             <p className="mt-3 text-sm text-muted-foreground">
-              Imagine the interviewer just asked you:
+              Imagine someone just asked you:
             </p>
             <p className="card-surface glow-urgent mt-4 w-full rounded-xl px-6 py-6 font-mono text-xl sm:text-2xl">
               “{concept.interviewQuestion}”
@@ -298,7 +300,7 @@ function DropPage() {
                 value={explanation}
                 onChange={(e) => setExplanation(e.target.value)}
                 rows={6}
-                placeholder="Explain this concept as if you were answering an interviewer…"
+                placeholder="Explain this concept in your own words…"
                 className="mt-2 w-full rounded-lg border border-input bg-card px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:border-urgent/60"
               />
               <SpeechButton onText={(t) => setExplanation((prev) => (prev ? prev + " " + t : t))} />
@@ -316,8 +318,18 @@ function DropPage() {
         {phase === "complete" && concept && (
           <div className="animate-fade-in">
             <h1 className="font-mono text-2xl font-bold tracking-[0.15em] text-primary uppercase sm:text-3xl">
-              Drop complete
+              Session complete
             </h1>
+            {firstToday && (
+              <div className="animate-scale-in card-surface glow-urgent mt-5 inline-block rounded-xl px-5 py-3">
+                <p className="font-mono text-sm font-bold tracking-[0.15em] text-urgent">
+                  <span className="inline-block animate-bounce">🔥</span> STREAK CONTINUED!
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {progress.streak} {progress.streak === 1 ? "day" : "days"} and counting.
+                </p>
+              </div>
+            )}
             <p className="mt-4 text-lg">
               You just spent 16 minutes with{" "}
               <span className="font-mono font-bold text-foreground">{concept.name}</span>.

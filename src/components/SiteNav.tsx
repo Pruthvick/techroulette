@@ -15,7 +15,7 @@ export function SiteNav() {
             ◆
           </span>
           <span className="font-mono text-sm font-semibold tracking-[0.22em] uppercase">
-            ConceptDrop
+            Tech Roulette
           </span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">

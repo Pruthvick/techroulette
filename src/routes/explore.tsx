@@ -7,16 +7,16 @@ import { categories, concepts, difficulties, type Concept } from "@/data/concept
 export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
-      { title: "Explore concepts — ConceptDrop" },
+      { title: "Explore concepts — Tech Roulette" },
       {
         name: "description",
         content:
-          "Browse and search every ConceptDrop concept across CS fundamentals, DSA, DBMS, system design, ML, deep learning and generative AI.",
+          "Browse and search every Tech Roulette concept across CS fundamentals, DSA, DBMS, system design, ML, deep learning and generative AI.",
       },
-      { property: "og:title", content: "Explore the ConceptDrop concept bank" },
+      { property: "og:title", content: "Explore the Tech Roulette concept bank" },
       {
         property: "og:description",
-        content: "Search and filter hundreds of CS and AI/ML interview concepts by category and difficulty.",
+        content: "Search and filter hundreds of CS and AI/ML concepts by category and difficulty.",
       },
     ],
   }),
