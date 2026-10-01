@@ -34,7 +34,7 @@ export function SiteNav() {
             to="/drop"
             className="ml-1 rounded-md bg-primary px-3 py-1.5 font-mono text-xs font-semibold tracking-wide text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm"
           >
-            DROP
+            SPIN
           </Link>
         </nav>
       </div>
