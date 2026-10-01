@@ -15,7 +15,7 @@ export function SiteNav() {
             ◆
           </span>
           <span className="font-mono text-sm font-semibold tracking-[0.22em] uppercase">
-            ConceptDrop
+            Tech Roulette
           </span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
@@ -34,7 +34,7 @@ export function SiteNav() {
             to="/drop"
             className="ml-1 rounded-md bg-primary px-3 py-1.5 font-mono text-xs font-semibold tracking-wide text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm"
           >
-            DROP
+            SPIN
           </Link>
         </nav>
       </div>

@@ -5,6 +5,7 @@ import {
   createRootRouteWithContext,
   useRouter,
   HeadContent,
+  type ErrorComponentProps,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
@@ -34,7 +35,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -77,16 +78,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ConceptDrop — One concept. Fifteen minutes." },
+      { title: "Tech Roulette — Your daily dose of technical randomness." },
       {
         name: "description",
         content:
-          "ConceptDrop turns random CS and AI/ML concepts into interview-ready knowledge: 15 minutes to learn, 60 seconds to explain.",
+          "Tech Roulette: spin a random CS or AI/ML concept, learn it in 15 minutes, explain it in 60 seconds.",
       },
-      { property: "og:title", content: "ConceptDrop" },
+      { property: "og:title", content: "Tech Roulette" },
       {
         property: "og:description",
-        content: "One concept. Fifteen minutes. One minute to explain it.",
+        content: "Your daily dose of technical randomness.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

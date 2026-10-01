@@ -20,6 +20,7 @@ export type Progress = {
   learningMinutes: number;
   explainMinutes: number;
   streak: number;
+  longestStreak: number;
   lastDay: string | null;
   soundOn: boolean;
 };
@@ -31,11 +32,24 @@ const empty: Progress = {
   learningMinutes: 0,
   explainMinutes: 0,
   streak: 0,
+  longestStreak: 0,
   lastDay: null,
   soundOn: false,
 };
 
-const dayKey = (d = new Date()) => d.toISOString().slice(0, 10);
+// Local calendar date (not UTC, not rolling 24h).
+export const dayKey = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const yesterdayKey = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return dayKey(d);
+};
+
+/** Current streak as of today: 0 if a calendar day was missed. */
+export function liveStreak(p: Progress) {
+  return p.lastDay === dayKey() || p.lastDay === yesterdayKey() ? p.streak : 0;
+}
 
 export function useProgress() {
   const [progress, setProgress] = useState<Progress>(empty);
@@ -66,7 +80,7 @@ export function useProgress() {
     (entry: Omit<CompletedEntry, "at">, learningMs: number, explainMs: number) =>
       update((p) => {
         const today = dayKey();
-        const yesterday = dayKey(new Date(Date.now() - 86400000));
+        const yesterday = yesterdayKey();
         const streak =
           p.lastDay === today ? p.streak : p.lastDay === yesterday ? p.streak + 1 : 1;
         return {
@@ -75,6 +89,7 @@ export function useProgress() {
           learningMinutes: p.learningMinutes + Math.round(learningMs / 60000),
           explainMinutes: p.explainMinutes + Math.round(explainMs / 60000),
           streak,
+          longestStreak: Math.max(p.longestStreak ?? 0, streak),
           lastDay: today,
         };
       }),

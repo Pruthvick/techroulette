@@ -1,18 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/SiteNav";
 import { Tag } from "@/components/ui/chip";
-import { useProgress } from "@/hooks/useProgress";
+import { useProgress, liveStreak } from "@/hooks/useProgress";
 
 export const Route = createFileRoute("/journey")({
   head: () => ({
     meta: [
-      { title: "Your concept journey — ConceptDrop" },
+      { title: "Your concept journey — Tech Roulette" },
       {
         name: "description",
         content:
-          "Track concepts explored, categories covered, learning minutes, streak and confidence ratings across your ConceptDrop sessions.",
+          "Track concepts explored, categories covered, learning minutes, streak and confidence ratings across your Tech Roulette sessions.",
       },
-      { property: "og:title", content: "Your ConceptDrop journey" },
+      { property: "og:title", content: "Your Tech Roulette journey" },
       {
         property: "og:description",
         content: "Concepts explored, categories covered, learning time and your current streak.",
@@ -30,6 +30,7 @@ function fmtMinutes(min: number) {
 
 function Journey() {
   const { progress } = useProgress();
+  const streakNow = liveStreak(progress);
   const cats = new Set(progress.completed.map((c) => c.category));
   const confidences = progress.completed
     .map((c) => c.confidence)
@@ -43,7 +44,7 @@ function Journey() {
     { value: String(progress.completed.length), label: "Concepts completed" },
     { value: String(cats.size), label: "Categories" },
     { value: fmtMinutes(progress.learningMinutes), label: "Learning time" },
-    { value: `${progress.streak}`, label: "Day streak" },
+    { value: `${streakNow}`, label: "Day streak" },
   ];
 
   return (
@@ -85,8 +86,8 @@ function Journey() {
           </div>
         </div>
 
-        {progress.streak > 0 && (
-          <p className="mt-6 font-mono text-sm">🔥 {progress.streak} day streak</p>
+        {streakNow > 0 && (
+          <p className="mt-6 font-mono text-sm">🔥 {streakNow} day streak · longest {progress.longestStreak ?? 0} days</p>
         )}
 
         <h2 className="mt-12 font-mono text-xs tracking-[0.3em] text-muted-foreground uppercase">
@@ -95,13 +96,13 @@ function Journey() {
         {progress.completed.length === 0 ? (
           <div className="card-surface mt-4 rounded-xl p-10 text-center">
             <p className="text-sm text-muted-foreground">
-              Nothing here yet. Your first drop takes 16 minutes.
+              Nothing here yet. Your first spin takes 16 minutes.
             </p>
             <Link
               to="/drop"
               className="mt-5 inline-block rounded-lg bg-primary px-6 py-3 font-mono text-xs font-bold tracking-[0.15em] text-primary-foreground"
             >
-              DROP A CONCEPT
+              SPIN
             </Link>
           </div>
         ) : (
