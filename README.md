@@ -1,21 +1,28 @@
 # TechRoulette
 
-Implement exactly the screenshot and nothing else
+🎰 Tech Roulette
 
-This project was built with [Lovable](https://lovable.dev).
+Your daily dose of technical randomness.
 
-## Build with Lovable
+🌐 Live Website: https://techroulette.vercel.app/
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/30467884-1583-46df-98be-f740fa02411e).
+Tech Roulette is a playful technical learning app that randomly gives you a CS or AIML concept and challenges you to:
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+🎰 SPIN for a random concept
 
-## Development
+🧠 Learn it in 15 minutes
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+🎤 Explain it in 1 minute
 
+🔥 Build a daily learning streak
+
+🛠️ Built With
+React
+TypeScript
+Tailwind CSS
+Vite
+GitHub
+Vercel
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
