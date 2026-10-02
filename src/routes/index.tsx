@@ -75,6 +75,7 @@ function Landing() {
 
           <Link
             to="/drop"
+            search={{ spin: true }}
             aria-label="Spin"
             className="group glow-primary relative mt-10 grid size-40 place-items-center rounded-full bg-primary font-mono text-2xl font-bold tracking-[0.25em] text-primary-foreground transition-transform duration-300 hover:scale-105 sm:size-44"
           >
