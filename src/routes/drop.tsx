@@ -322,7 +322,7 @@ function DropPage() {
                 {learn.running ? "PAUSE" : "RESUME"}
               </ControlButton>
               <ControlButton onClick={() => learn.start(LEARN_MS)}>RESTART</ControlButton>
-              <ControlButton onClick={() => beginDrop()}>NEW CONCEPT</ControlButton>
+              <ControlButton onClick={() => { learn.pause?.(); setPhase("setup"); startSpin(); }}>NEW CONCEPT</ControlButton>
               <ControlButton
                 onClick={() => {
                   setPhase("explain");
@@ -460,7 +460,8 @@ function DropPage() {
               <button
                 onClick={() => {
                   annotateLatest({ struggle });
-                  beginDrop();
+                  setPhase("setup");
+                  startSpin();
                 }}
                 className="glow-primary flex-1 rounded-lg bg-primary px-6 py-3.5 font-mono text-sm font-bold tracking-[0.15em] text-primary-foreground"
               >
