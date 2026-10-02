@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SiteNav } from "@/components/SiteNav";
 import { TimerRing } from "@/components/TimerRing";
+import { Roulette } from "@/components/Roulette";
 import { Chip, Tag } from "@/components/ui/chip";
 import { formatClock, useCountdown } from "@/hooks/useCountdown";
 import { useProgress, readRecentIds, dayKey } from "@/hooks/useProgress";
@@ -21,9 +22,12 @@ const EXPLAIN_MS = 60 * 1000;
 type Phase = "setup" | "learning" | "explain" | "complete";
 
 export const Route = createFileRoute("/drop")({
-  validateSearch: (search: Record<string, unknown>): { concept?: string } => {
+  validateSearch: (search: Record<string, unknown>): { concept?: string; spin?: boolean } => {
     const raw = search["concept"];
-    return typeof raw === "string" ? { concept: raw } : {};
+    const out: { concept?: string; spin?: boolean } = {};
+    if (typeof raw === "string") out.concept = raw;
+    if (search["spin"] === true || search["spin"] === "1" || search["spin"] === 1) out.spin = true;
+    return out;
   },
   head: () => ({
     meta: [
@@ -31,20 +35,22 @@ export const Route = createFileRoute("/drop")({
       {
         name: "description",
         content:
-          "Get a random concept, learn it for 15 minutes, then explain it out loud in 60 seconds.",
+          "Spin the roulette for a random concept, learn it for 15 minutes, then explain it out loud in 60 seconds.",
       },
       { property: "og:title", content: "Tech Roulette — 15 minutes on the clock" },
       {
         property: "og:description",
         content: "A random CS or AI/ML concept, a 15-minute learning timer and a 60-second explanation.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DropPage,
 });
 
 function DropPage() {
-  const { concept: presetId } = Route.useSearch();
+  const { concept: presetId, spin: autoSpin } = Route.useSearch();
   const navigate = useNavigate();
   const { progress, markAttempt, markComplete, annotateLatest, toggleSound } = useProgress();
 
@@ -58,6 +64,10 @@ function DropPage() {
   const [struggle, setStruggle] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [spinning, setSpinning] = useState(false);
+  const [spinKey, setSpinKey] = useState(0);
+  const [revealed, setRevealed] = useState<Concept | null>(null);
 
   const soundOn = progress.soundOn;
 
@@ -127,7 +137,10 @@ function DropPage() {
         e.preventDefault();
         active.toggle();
       } else if (e.key.toLowerCase() === "n") {
-        beginDrop();
+        if (!spinning) {
+          setPhase("setup");
+          startSpin();
+        }
       } else if (e.key === "Escape") {
         void navigate({ to: "/" });
       }
@@ -136,13 +149,31 @@ function DropPage() {
     return () => globalThis.removeEventListener("keydown", onKey);
   }, [active, beginDrop, navigate]);
 
-  const poolSize = useMemo(
+  const pool = useMemo(
     () =>
       concepts.filter(
         (c) => (!category || c.category === category) && (!difficulty || c.difficulty === difficulty),
-      ).length,
+      ),
     [category, difficulty],
   );
+
+  function startSpin() {
+    if (spinning) return;
+    if (pool.length === 0) {
+      setError("No concepts match those filters. Try widening the category or difficulty.");
+      return;
+    }
+    setError(null);
+    setShowFilters(false);
+    setSpinning(true);
+    setSpinKey((k) => k + 1);
+  }
+
+  // Auto-spin when arriving from the home SPIN button.
+  useEffect(() => {
+    if (autoSpin && !presetId) startSpin();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
@@ -152,54 +183,102 @@ function DropPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         {phase === "setup" && (
-          <div className="animate-fade-in">
-            <h1 className="font-mono text-2xl font-bold tracking-tight sm:text-3xl">
-              Ready for a drop?
+          <div className="animate-fade-in flex flex-col items-center text-center">
+            <h1 className="font-mono text-3xl font-bold tracking-tight sm:text-4xl">
+              <span className="text-gradient">TECH ROULETTE</span>
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pick your scope, or just hit drop. The 15-minute timer starts the moment the concept
-              appears.
+              {revealed ? "" : spinning ? "Spinning…" : "What will you learn today?"}
+            </p>
+            <p className="mt-4 font-mono text-[0.7rem] tracking-[0.15em] text-muted-foreground uppercase">
+              Topic: {category ?? "All"} · Difficulty: {difficulty ?? "Random"}
             </p>
 
-            <p className="mt-8 font-mono text-[0.7rem] tracking-[0.3em] text-muted-foreground uppercase">
-              Topic
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Chip active={!category} onClick={() => setCategory(null)}>
-                All Topics
-              </Chip>
-              {categories.map((c) => (
-                <Chip key={c} active={category === c} onClick={() => setCategory(c)}>
-                  {c}
-                </Chip>
-              ))}
+            <div className="mt-6 w-full">
+              <Roulette
+                pool={pool}
+                spinKey={spinKey}
+                onLanded={(c) => {
+                  setRevealed(c);
+                  playChime(soundOn);
+                  globalThis.setTimeout(() => {
+                    setSpinning(false);
+                    setRevealed(null);
+                    beginDrop(c);
+                  }, 1800);
+                }}
+              />
             </div>
 
-            <p className="mt-8 font-mono text-[0.7rem] tracking-[0.3em] text-muted-foreground uppercase">
-              Difficulty
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Chip active={!difficulty} onClick={() => setDifficulty(null)}>
-                Random
-              </Chip>
-              {difficulties.map((d) => (
-                <Chip key={d} active={difficulty === d} onClick={() => setDifficulty(d)}>
-                  {d}
-                </Chip>
-              ))}
-            </div>
+            {revealed && (
+              <div className="animate-scale-in mt-6">
+                <p className="font-mono text-[0.7rem] tracking-[0.35em] text-primary uppercase">
+                  🎰 You got
+                </p>
+                <p className="mt-2 font-mono text-3xl font-bold uppercase sm:text-4xl">
+                  {revealed.name}
+                </p>
+                <div className="mt-3 flex justify-center gap-2">
+                  <Tag>{revealed.category}</Tag>
+                  <Tag>{revealed.difficulty}</Tag>
+                </div>
+              </div>
+            )}
 
-            <p className="mt-4 font-mono text-xs text-muted-foreground">
-              {poolSize} concepts in scope
-            </p>
             {error && <p className="mt-3 font-mono text-xs text-destructive">{error}</p>}
 
-            <button
-              onClick={() => beginDrop()}
-              className="glow-primary mt-8 w-full rounded-lg bg-primary px-8 py-4 font-mono text-sm font-bold tracking-[0.2em] text-primary-foreground transition-transform hover:scale-[1.01] sm:w-auto"
-            >
-              SPIN
-            </button>
+            {!revealed && (
+              <button
+                onClick={startSpin}
+                disabled={spinning}
+                className="glow-primary mt-8 rounded-full bg-primary px-14 py-4 font-mono text-lg font-bold tracking-[0.25em] text-primary-foreground transition-transform hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+              >
+                {spinning ? "SPINNING..." : "SPIN"}
+              </button>
+            )}
+
+            {!spinning && (
+              <button
+                onClick={() => setShowFilters((s) => !s)}
+                className="mt-5 font-mono text-xs tracking-[0.2em] text-muted-foreground hover:text-foreground"
+              >
+                {showFilters ? "HIDE FILTERS" : "FILTERS"}
+              </button>
+            )}
+
+            {showFilters && !spinning && (
+              <div className="card-surface animate-fade-in mt-4 w-full rounded-xl p-5 text-left">
+                <p className="font-mono text-[0.7rem] tracking-[0.3em] text-muted-foreground uppercase">
+                  Topic
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Chip active={!category} onClick={() => setCategory(null)}>
+                    All Topics
+                  </Chip>
+                  {categories.map((c) => (
+                    <Chip key={c} active={category === c} onClick={() => setCategory(c)}>
+                      {c}
+                    </Chip>
+                  ))}
+                </div>
+                <p className="mt-6 font-mono text-[0.7rem] tracking-[0.3em] text-muted-foreground uppercase">
+                  Difficulty
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Chip active={!difficulty} onClick={() => setDifficulty(null)}>
+                    Random
+                  </Chip>
+                  {difficulties.map((d) => (
+                    <Chip key={d} active={difficulty === d} onClick={() => setDifficulty(d)}>
+                      {d}
+                    </Chip>
+                  ))}
+                </div>
+                <p className="mt-4 font-mono text-xs text-muted-foreground">
+                  {pool.length} concepts on the wheel
+                </p>
+              </div>
+            )}
           </div>
         )}
 
