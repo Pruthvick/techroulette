@@ -99,7 +99,7 @@ function Journey() {
               Nothing here yet. Your first spin takes 16 minutes.
             </p>
             <Link
-              to="/drop"
+              to="/drop" search={{ spin: true }}
               className="mt-5 inline-block rounded-lg bg-primary px-6 py-3 font-mono text-xs font-bold tracking-[0.15em] text-primary-foreground"
             >
               SPIN

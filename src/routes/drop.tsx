@@ -322,7 +322,7 @@ function DropPage() {
                 {learn.running ? "PAUSE" : "RESUME"}
               </ControlButton>
               <ControlButton onClick={() => learn.start(LEARN_MS)}>RESTART</ControlButton>
-              <ControlButton onClick={() => { learn.pause?.(); setPhase("setup"); startSpin(); }}>NEW CONCEPT</ControlButton>
+              <ControlButton onClick={() => { learn.pause(); setPhase("setup"); startSpin(); }}>NEW CONCEPT</ControlButton>
               <ControlButton
                 onClick={() => {
                   setPhase("explain");
